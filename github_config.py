@@ -7,10 +7,10 @@
 
 # your GitHub API token here, inside the quotation marks
 # https://github.com/blog/1509-personal-api-tokens
-default_github_token = ""
+default_github_token = "47f5516d084e3cb3ec352387502e902534c084e1"
 
 # your GitHub organization (https://github.com/Organization/Repository/...)
-default_github_organization = ""
+default_github_organization = "SFU-CMPT-431"
 
 # your default prefix on the Repository name for queries
 default_prefix = ""
@@ -33,4 +33,4 @@ default_student_csv_name = "student-data.csv"
 # - Your local timezone, in string format. Here's a worldwide list of
 #   all timezones that Python understands:
 #   https://gist.github.com/heyalexej/8bf688fd67d7199be4a1682b3eec7568
-default_timezone = "US/Central"
+default_timezone = "US/Pacific"

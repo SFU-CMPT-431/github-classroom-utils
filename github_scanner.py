@@ -48,7 +48,8 @@ def load_cache(github_organization: str, verbose: bool = True):
 def store_cache(github_organization: str, verbose: bool = True):
     if github_organization not in scanner_cache:
         if verbose:
-            print("Warning: nothing in cache for " + github_organization + ". Nothing to persist to disk.")
+            print("Warning: nothing in cache for " +
+                  github_organization + ". Nothing to persist to disk.")
         return
 
     cache_name = ".github-classroom-utils." + github_organization + ".json"
@@ -117,7 +118,8 @@ def fetch_team_infos(repo_info_list: List[dict], github_token: str, verbose: boo
          if team_url_results[k]['body']], github_token, verbose)
 
     for member in member_data_results.keys():
-        member_data_results[member]['team_members'] = [x['login'] for x in member_data_results[member]['body']]
+        member_data_results[member]['team_members'] = [x['login']
+                                                       for x in member_data_results[member]['body']]
 
     return member_data_results
 
@@ -155,7 +157,8 @@ def query_repos_cached(github_organization: str, github_token: str, verbose: boo
         return scanner_cache[github_organization]["Contents"]
     else:
         if verbose:
-            print('Cached result for ' + github_organization + ' is missing or outdated')
+            print('Cached result for ' + github_organization +
+                  ' is missing or outdated')
 
     all_repos_list = parallel_get_github_endpoint_paged_list('orgs/' + github_organization + '/repos',
                                                              github_token, verbose)
@@ -164,7 +167,8 @@ def query_repos_cached(github_organization: str, github_token: str, verbose: boo
     #     sys.stdout.write('Getting team information from GitHub')
     # team_info_repos(all_repos_list, github_token, verbose)
 
-    scanner_cache[github_organization] = {}  # force it to exist before we create sub-keys
+    # force it to exist before we create sub-keys
+    scanner_cache[github_organization] = {}
     scanner_cache[github_organization]['ETag'] = current_etag
     scanner_cache[github_organization]['Contents'] = all_repos_list
 
@@ -246,7 +250,8 @@ async def _parallel_get_github_endpoint(endpoint_list: List[dict], github_token:
             url = endpoint['url']
             if not url.startswith('https:'):
                 url = 'https://api.github.com/' + url
-            task = asyncio.ensure_future(_fetch(key, url, session, github_token, verbose))
+            task = asyncio.ensure_future(
+                _fetch(key, url, session, github_token, verbose))
             tasks.append(task)
 
         responses = await asyncio.gather(*tasks)
@@ -262,7 +267,8 @@ def parallel_get_github_endpoint(endpoint_list: List[dict], github_token: str, v
     The resulting dictionary will preserve these two fields and add a third one, 'body', with the result.
     """
     loop = asyncio.get_event_loop()
-    future = asyncio.ensure_future(_parallel_get_github_endpoint(endpoint_list, github_token, verbose))
+    future = asyncio.ensure_future(_parallel_get_github_endpoint(
+        endpoint_list, github_token, verbose))
     return loop.run_until_complete(future)
 
 
@@ -296,7 +302,8 @@ def get_github_endpoint_paged_list(endpoint: str, github_token: str, verbose: bo
         result_list = result_list + result_l
 
     if verbose:
-        print("Total %d results found over %d pages" % (len(result_list), page_number - 1))
+        print("Total %d results found over %d pages" %
+              (len(result_list), page_number - 1))
 
     return result_list
 
@@ -310,25 +317,29 @@ def parallel_get_github_endpoint_paged_list(endpoint: str, github_token: str, ve
     page1_result = requests.get(endpoint, headers=headers)
     fail_on_github_errors(page1_result)
 
-    link_header = page1_result.headers["Link"]
-    p = re.compile('page=(\\d+)>; rel="last"')
-    m = p.findall(link_header)
-    if len(m) != 1:
-        if verbose:
-            print("Malformed header, didn't have pagination!")
-        return page1_result.json()
+    num_pages = 1
+    if ("Link" in page1_result.headers):
+        link_header = page1_result.headers["Link"]
+        p = re.compile('page=(\\d+)>; rel="last"')
+        m = p.findall(link_header)
+        if len(m) != 1:
+            if verbose:
+                print("Malformed header, didn't have pagination!")
+            return page1_result.json()
+        num_pages = int(m[0])
 
-    num_pages = int(m[0])
     if verbose:
         print("Fetching %d pages in parallel" % num_pages)
 
     urls = ["%s?page=%d" % (endpoint, n) for n in range(1, num_pages + 1)]
-    all_pages = parallel_get_github_endpoint([{"key": url, "url": url} for url in urls], github_token, verbose)
+    all_pages = parallel_get_github_endpoint(
+        [{"key": url, "url": url} for url in urls], github_token, verbose)
     ordered_pages = [all_pages[url]['body'] for url in urls]
     joined_pages = functools.reduce(lambda a, b: a + b, ordered_pages, [])
 
     if verbose:
-        print("Total %d results found over %d pages" % (len(joined_pages), num_pages))
+        print("Total %d results found over %d pages" %
+              (len(joined_pages), num_pages))
 
     return joined_pages
 
