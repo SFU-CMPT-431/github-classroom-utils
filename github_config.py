@@ -7,7 +7,7 @@
 
 # your GitHub API token here, inside the quotation marks
 # https://github.com/blog/1509-personal-api-tokens
-default_github_token = "47f5516d084e3cb3ec352387502e902534c084e1"
+default_github_token = "35b0c15d12fc9a382c26abac49b2a9cfc621fc7b"
 
 # your GitHub organization (https://github.com/Organization/Repository/...)
 default_github_organization = "SFU-CMPT-431"
